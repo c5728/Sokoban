@@ -1,46 +1,49 @@
 'use strict';
 
 let http = require('http');
-<<<<<<< HEAD
 
 http.createServer((request, response) => {
+let fs = require('fs');
+let postData = ''; // POST 資料
+
+// 利⽤'data' event 消耗掉data chunk;
+// 'end' event 才會被fired
+request.on('data', (chunk) => {
+postData += chunk;
+
+console.log(
+' 接收的POST data ⽚段k: [' + chunk + '].'
+);
+});
+
 request.on('end', () => {
-console.log('Request method: ' + request.method);
-console.log('Request url: ' + request.url);
+switch (request.url) {
+case '/':
+fs.readFile('../htdocs/index.html', (err, data) => {
+if (err) {
+console.log(' 檔案讀取錯誤');
+}
+else {
+response.writeHead(200, {
+'Content-Type': 'text/html'
 });
 
-// 傳送HTTP header
-// HTTP Status: 200 : OK
-// Content Type: text/plain
-response.writeHead(200, {
-'Content-Type': 'text/plain'
-});
-
-// 傳送回應內容。
-response.end('Hello World!\n');
-}).listen(8088);
-
-// log message to Console
-console.log('Server running at http://127.0.0.1:8088/');
-=======
-http.createServer((request, response) => {
-// 1.傳送HTTP header  2.HTTP Status: 200 : OK   3.Content Type: text/plain
-//取得 node.js 的 fs 模組
-let fs = require('fs')
-
-fs.readFile('../htdocs/index.html',(err,data) => {
-
-response.writeHead(200, {
- 'Content-Type': 'text/html'
- });
 response.write(data);
+response.end();
+}
 });
-// 傳送回應內容。
+
+break;
+
+default:
+console.log(' 未定義的存取: ' + request.url);
+
 response.end();
 
-console.log('request.headers: \n', request.headers)
+break;
+}
+});
 }).listen(8088);
 
 // log message to Console
 console.log(' 伺服器啓動，連線url: http://127.0.0.1:8088/');
->>>>>>> 84c59f6abd5eca3cae8e0636293823fc26a98022
